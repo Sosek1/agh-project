@@ -50,7 +50,6 @@ export function DataTable({ columns, data }) {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
-
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} />

@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 import { MainNav } from "@/components/MainNav";
 
 import { DataTable } from "./components/DataTable";
@@ -5,7 +7,26 @@ import { Columns } from "./components/Columns";
 import { UserNav } from "./components/UserNav";
 import { navigationLinks } from "../../config/navigationLinks";
 
+import { useActions } from "@/store/actions-context";
+
 export const CustomersPage = () => {
+  const [customersData, setCustomersData] = useState([]);
+  const { deleteAction, editAction } = useActions();
+
+  const fetchCustomersData = async () => {
+    const response = await fetch("http://127.0.0.1:8000/customers");
+    const data = await response.json();
+    setCustomersData(data);
+  };
+
+  useEffect(() => {
+    fetchCustomersData();
+  }, []);
+
+  useEffect(() => {
+    fetchCustomersData();
+  }, [deleteAction, editAction]);
+
   return (
     <div className="hidden flex-col md:flex">
       <div className="border-b">
@@ -21,17 +42,7 @@ export const CustomersPage = () => {
           <h2 className="text-3xl font-bold tracking-tight">Customers</h2>
         </div>
         <div className="hidden h-full flex-1 flex-col space-y-8 md:flex">
-          <DataTable
-            data={[
-              {
-                id: 1,
-                fullname: "Test",
-                email: "test@example.com",
-                phoneNumber: "000-000-000",
-              },
-            ]}
-            columns={Columns}
-          />
+          <DataTable data={customersData} columns={Columns} />
         </div>
       </div>
     </div>
