@@ -140,37 +140,6 @@ export const AddCustomerPage = () => {
           </Form>
         </div>
       </div>
-      <form onSubmit={submitFormHandler} className="addCustomerForm">
-        <label>name</label>
-        <input
-          onChange={getName}
-          value={name}
-          placeholder="John"
-          type="text"
-        ></input>
-        <label>surname</label>
-        <input
-          onChange={getSurname}
-          value={surname}
-          placeholder="Doe"
-          type="text"
-        ></input>
-        <label>Email</label>
-        <input
-          onChange={getEmail}
-          value={email}
-          placeholder="emial@email.com"
-          type="text"
-        ></input>
-        <label>PhoneNumber</label>
-        <input
-          onChange={getPhoneNumber}
-          value={phoneNumber}
-          placeholder="123 456 789"
-          type="text"
-        ></input>
-        <button type="submit">Submit</button>
-      </form>
     </div>
   );
 };

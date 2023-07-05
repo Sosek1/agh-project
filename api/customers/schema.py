@@ -10,10 +10,10 @@ class CustomerCreateSchema(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "name": "Jan",
-                "surname": "Kowalski",
-                "email": "jan.kowalski@example.com",
-                "phone_number": "000-000-000",
+                "name": "Bartosz",
+                "surname": "Sosin",
+                "email": "bartek.sosin@mail.com",
+                "phone_number": "123-456-789",
             }
         }
 
@@ -25,7 +25,7 @@ class CustomerUpdateSchema(BaseModel):
     phone_number: str | None
 
     class Config:
-        schema_extra = {"example": {"name": "Jan", "surname": "Kowalski"}}
+        schema_extra = {"example": {"name": "Bartosz", "surname": "Sosin"}}
 
 
 class Customer(CustomerCreateSchema):
@@ -45,23 +45,45 @@ class OrderCreateSchema(BaseModel):
         }
 
 
+class OrderUpdateSchema(BaseModel):
+    customer_id: int | None
+    order_items: list[int] | None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "customer_id": 0,
+                "order_items": [0, 1, 2, 3],
+            }
+        }
+
+
 class Order(OrderCreateSchema):
     order_id: int
 
 
 class ProductCreateSchema(BaseModel):
     name: str
-    price: float
+    price: str
     description: str
 
     class Config:
         schema_extra = {
             "example": {
                 "name": "Product",
-                "price": 0.0,
+                "price": "0.00$",
                 "description": "Product description",
             }
         }
+
+
+class ProductUpdateSchema(BaseModel):
+    name: str | None
+    price: str | None
+    description: str | None
+
+    class Config:
+        schema_extra = {"example": {"name": "Product"}}
 
 
 class Product(ProductCreateSchema):

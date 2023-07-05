@@ -24,7 +24,20 @@ import TeamSwitcher from "@/components/TeamSwitcher";
 import { UserNav } from "@/components/UserNav";
 import { navigationLinks } from "../config/navigationLinks";
 
+import { useState, useEffect } from "react";
+
 export const DashboardPage = () => {
+  const [salesAmount, setSalesAmount] = useState(0);
+  const fetchOrdersData = async () => {
+    const response = await fetch("http://127.0.0.1:8000/orders");
+    const data = await response.json();
+    setSalesAmount(data.length);
+  };
+
+  useEffect(() => {
+    fetchOrdersData();
+  }, []);
+
   return (
     <div className="hidden flex-col md:flex">
       <div className="border-b">
@@ -131,7 +144,7 @@ export const DashboardPage = () => {
                 <CardHeader>
                   <CardTitle>Recent Sales</CardTitle>
                   <CardDescription>
-                    You made 265 sales this month.
+                    You made <strong>{salesAmount}</strong> sales this month.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

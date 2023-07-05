@@ -28,25 +28,22 @@ import { useActions } from "@/store/actions-context";
 import { useState } from "react";
 
 export function DataTableRowActions({ row }) {
-  const [updateCustomersData, setUpdateCustomersData] = useState({
-    name: row.original.name,
-    surname: row.original.surname,
-    email: row.original.email,
-    phone_number: row.original.phone_number,
+  const [updateOrderData, setUpdateOrderData] = useState({
+    customerID: row.original.customer_id,
+    orderItems: row.original.order_items,
   });
   const { onDelete, deleteAction, onEdit, editAction } = useActions();
   const { toast } = useToast();
 
-  const deleteCustomerHandler = async () => {
-    const response = await fetch(
-      `http://127.0.0.1:8000/customers/${row.original.id}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  console.log(row);
+
+  const deleteOrderHandler = async () => {
+    const response = await fetch(`http://127.0.0.1:8000/orders/${row.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       toast({
@@ -60,41 +57,57 @@ export function DataTableRowActions({ row }) {
     }
 
     toast({
-      title: "Deleted customer",
-      description: "Customer has been succesfully deleted",
+      title: "Deleted order",
+      description: "Order has been succesfully deleted",
     });
 
     onDelete(!deleteAction);
   };
 
-  const editCustomerHandler = async () => {
-    const response = await fetch(
-      `http://127.0.0.1:8000/customers/${row.original.id}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(updateCustomersData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  const editOrderHandler = async () => {
+    const orderItemsIDs = [];
 
-    onEdit(!editAction);
+    function isCharNumber(c) {
+      return c >= "0" && c <= "9";
+    }
+
+    for (let char of updateOrderData.orderItems) {
+      if (isCharNumber(char)) {
+        orderItemsIDs.push(Number(char));
+      }
+    }
+
+    const order_data = {
+      customer_id: Number(updateOrderData.customerID),
+      order_items: orderItemsIDs,
+    };
+
+    const response = await fetch(`http://127.0.0.1:8000/orders/${row.id}`, {
+      method: "PATCH",
+      body: JSON.stringify(order_data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const resData = await response.json();
 
     if (!response.ok) {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: `There was a problem with your request: ${data.message} `,
+        description: `There was a problem with your request: ${resData.message} `,
         action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
 
       return;
     }
 
+    onEdit(!editAction);
+
     toast({
-      title: "Edited customer",
-      description: "Customer has been succesfully edited",
+      title: "Edited order",
+      description: "Order has been succesfully edited",
     });
   };
 
@@ -118,80 +131,45 @@ export function DataTableRowActions({ row }) {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Edit customer</DialogTitle>
+                <DialogTitle>Edit order</DialogTitle>
                 <DialogDescription>
-                  Make changes to choosen customer here. Click save when you're
-                  done.
+                  Enter order data to update it. Click save when you're done.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
+                  <Label htmlFor="customerID" className="text-right">
+                    Customer ID
                   </Label>
                   <Input
-                    id="name"
-                    value={updateCustomersData.name}
+                    value={updateOrderData.customerID}
                     className="col-span-3"
                     onChange={(e) =>
-                      setUpdateCustomersData({
-                        ...updateCustomersData,
-                        name: e.target.value,
+                      setUpdateOrderData({
+                        ...updateOrderData,
+                        customerID: e.target.value,
                       })
                     }
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="surname" className="text-right">
-                    Surname
+                  <Label htmlFor="orders_id" className="text-right">
+                    Items
                   </Label>
                   <Input
-                    id="surname"
-                    value={updateCustomersData.surname}
+                    value={updateOrderData.orderItems}
                     className="col-span-3"
                     onChange={(e) =>
-                      setUpdateCustomersData({
-                        ...updateCustomersData,
-                        surname: e.target.value,
+                      setUpdateOrderData({
+                        ...updateOrderData,
+                        orderItems: e.target.value,
                       })
                     }
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    email
-                  </Label>
-                  <Input
-                    id="email"
-                    value={updateCustomersData.email}
-                    className="col-span-3"
-                    onChange={(e) =>
-                      setUpdateCustomersData({
-                        ...updateCustomersData,
-                        email: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="phonenumber" className="text-right">
-                    Phone number
-                  </Label>
-                  <Input
-                    id="phonenumber"
-                    value={updateCustomersData.phone_number}
-                    onChange={(e) =>
-                      setUpdateCustomersData({
-                        ...updateCustomersData,
-                        phone_number: e.target.value,
-                      })
-                    }
-                    className="col-span-3"
                   />
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={editCustomerHandler} type="submit">
+                <Button onClick={editOrderHandler} type="submit">
                   Save changes
                 </Button>
               </DialogFooter>
@@ -199,7 +177,7 @@ export function DataTableRowActions({ row }) {
           </Dialog>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={deleteCustomerHandler}>
+        <DropdownMenuItem onClick={deleteOrderHandler}>
           <Trash className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
           Delete
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
